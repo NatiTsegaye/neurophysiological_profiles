@@ -15,7 +15,7 @@ The pipeline was forked from the Neurophysiological Profiles project (a story-li
 - `src/ecg_utils/` – Core processing library with modules for cleaning (`nk_pipeline.py`), segmentation and validation (`data_utils.py`), shared helpers (`common.py`), parameter definitions (`parameters.py`), plotting utilities (`plot_utils.py`), and data quality flagging (`clean_impute.py`).
 - `src/app/ecg_high_level_fnc.py` – High-level orchestration for computing windowed HRV metrics over segmented data, including export of metrics and preprocessed ECG traces.
 - `Analysis notebooks/` – Jupyter notebooks (`001_data_preparation.ipynb`–`005_eda_preproc_plot.ipynb`) that document end-to-end workflows from raw data preparation to ECG/EDA analysis and final dataset formatting.
-- `scripts/check_raw_data_consistency.py` – Standalone pre-flight check that validates a folder of Mindware exports (file naming, channel names, sample rate, event markers) against what `001_data_preparation.ipynb` expects.
+- `scripts/` – Standalone utilities: `check_raw_data_consistency.py` validates a folder of Mindware exports (file naming, channel names, sample rate, event markers) against what `001_data_preparation.ipynb` expects, and `fix_raw_data_consistency.py` applies the mechanical subset of those findings (filename conventions, misspelled channel names, duplicate `Start` markers).
 - `data/` – Project datasets. The TECH raw exports live in `data/BioLab/` (full delivery) and `data/Sample TECH/` (two-subject sample); derivatives are tracked through `interim/`, `processed/`, and `final/`.
 - `reports/` – Generated reports and QA artefacts: `data_preparation_report.md`, `raw_data_consistency_report.md`, per-subject ECG QA plots in `reports/QA/ecg/{subject}_{role}/`, and the EDA preprocessing figures written by notebook `005`.
 - `docs/` – Reference materials and decision logs (e.g., `Mindware Missing Data Report.docx`, `Mindware event file modifications.docx`, `ECG Preprocess Data Quality Log.docx`).
@@ -42,9 +42,10 @@ The pipeline was forked from the Neurophysiological Profiles project (a story-li
    jupyter lab
    ```
    The notebooks resolve the library via `sys.path.append(Path().cwd().parent / "src")`, so the kernel's working directory must be `Analysis notebooks/`. Open them in place rather than copying them elsewhere.
-4. Sanity-check the raw exports before running the pipeline, so that misnamed files or renamed channels are caught up front rather than silently dropped:
+4. Sanity-check the raw exports before running the pipeline, so that misnamed files or renamed channels are caught up front rather than silently dropped, then apply the mechanical fixes (the fixer is a dry run until you pass `--apply`):
    ```bash
    python scripts/check_raw_data_consistency.py --data-dir "data/BioLab"
+   python scripts/fix_raw_data_consistency.py --data-dir "data/BioLab"
    ```
 5. Review the study-specific configuration in `src/ecg_utils/parameters.py` (event names, per-event window durations, sampling frequency, powerline noise) and the raw-data folder that `001_data_preparation.ipynb` points at before running analyses.
 
@@ -98,6 +99,6 @@ Adjust the paths to match your subject id and ensure the target directories exis
 ## Notebooks & Reporting
 - Run the numbered notebooks sequentially to reproduce full analyses: raw import, dyad splitting and event marking (`001`), ECG/HRV pipeline (`002`), EDA analysis (`003`), final dataset reshaping (`004`), and EDA preprocessing visualizations (`005`).
 - `001` writes `reports/data_preparation_report.md` (plus a per-segment CSV) listing the segmentation rules that were applied and any problems worth checking: missing files, missing `Start` markers, and segments truncated because the recording was shorter than the requested window.
-- `scripts/check_raw_data_consistency.py` writes `reports/raw_data_consistency_report.md`, which covers the problems `001` cannot see because it never opens a misnamed file.
+- `scripts/check_raw_data_consistency.py` writes `reports/raw_data_consistency_report.md`, which covers the problems `001` cannot see because it never opens a misnamed file. `scripts/fix_raw_data_consistency.py` writes `reports/raw_data_fixes_report.md`, listing what it repaired and what it deliberately left for manual review.
 - ECG QA plots land in `reports/QA/ecg/{subject}_{role}/{segment}_{window}.png`, providing visual checks before aggregating across segments. Notebook `005` writes per-segment EDA preprocessing figures directly to `reports/`.
 - `004_reformat_final_datasets.ipynb` is **not yet adapted**: it pivots on story names (`Story 1`–`Story 5`) and reads the original project's behavioral workbook, neither of which exist in the TECH dataset. It therefore fails at the first cell that loads behavioral data, and `data/final/neuro-behavioral_data.xlsx` is not produced.
