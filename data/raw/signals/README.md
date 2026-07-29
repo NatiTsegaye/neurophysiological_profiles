@@ -1,18 +1,5 @@
 # Raw Physiological Signals
 
-Contains Mindware signal exports (e.g., ECG, EDA) exactly as delivered. Do not overwrite files; create cleaned derivatives under `data/interim` or `data/processed` instead.
+Empty placeholder inherited from the original project, which exported Mindware signals and event logs into separate folders. The TECH exports keep both in a single folder, so this directory is unused.
 
-## File Schema
-
-Mindware `.txt` signal exports include an inline metadata row followed by tab-delimited samples:
-
-- Line 1: `Sample Rate:\t{float}` (Hz).
-- Line 2 onward: physiological samples with the following columns.
-
-| Column | Type | Description |
-| --- | --- | --- |
-| `Time (s)` | float | Elapsed recording time in seconds from acquisition start. |
-| `MWMOBILEJ_Bio` | float | Raw biosignal channel exported by Mindware (typically ECG voltage). |
-| `MWMOBILEJ_GSC` *(optional)* | float | Galvanic skin conductance channel when recorded alongside ECG. |
-
-Files always include `Time (s)` and `MWMOBILEJ_Bio`; `MWMOBILEJ_GSC` appears when the session captured GSR/EDA.
+Raw TECH signal files live in `data/BioLab/` (and the `data/Sample TECH/` sample) as `{subject_id}_{event_name}_raw.txt`. See `data/raw/README.md` for the file naming convention and the column schema.

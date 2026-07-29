@@ -1,21 +1,23 @@
 # Interim Signals
 
-Stores partially cleaned or resampled physiological signals generated during exploratory processing. These assets feed into QA checks before full windowed analyses occur.
+Signal tables written by `001_data_preparation.ipynb`, one per dyad member. Each file concatenates that subject's five event recordings (`Baseline`, `DCP`, `IDP`, `NDCP`, `Recovery`) in configuration order and carries the markers needed for segmentation.
 
 ## File Schema
 
-Files are CSV exports named `{subject_id}_signal_events.csv`. They combine raw signal samples with aligned event metadata:
+Files are CSV exports named `{subject}_{role}_signal_events.csv` (e.g. `T001_child_signal_events.csv`).
 
 | Column | Type | Description |
 | --- | --- | --- |
-| `time_seconds_original_file` | float | Original Mindware timestamp in seconds. |
-| `MWMOBILEJ_Bio` | float | Raw biosignal channel copied from the Mindware export. |
-| `MWMOBILEJ_GSC` | float | Raw galvanic skin conductance channel when available. |
-| `source_file_signal` | string | Source filename for the Mindware signal export. |
-| `Event Type` | string | Event category joined from the event log. |
-| `event_name` | string | Human-readable event label (baseline, story blocks, etc.). |
-| `source_file_event` | string | Source filename for the Mindware event export. |
-| `on_offset` | string | Derived event marker (`onset` or `offset`). |
-| `subject_id` | string | Participant identifier assigned during preprocessing. |
+| `time_seconds_original_file` | float | Timestamp in seconds from the source Mindware file. Restarts at 0 for every event, so it is **not** monotonic across the file. |
+| `MWMOBILEJ_Bio` | float | ECG channel for this role, renamed from `TECH-CHILD_Bio` / `TECH-PARENT_Bio`. |
+| `MWMOBILEJ_GSC` | float | Skin conductance channel for this role (µS), renamed from `TECH-CHILD_GSC` / `TECH-PARENT_GSC`. |
+| `event_name` | string | Event label (`Baseline`, `DCP`, `IDP`, `NDCP`, `Recovery`). Populated **only** on the two marker rows of each event; null elsewhere. |
+| `on_offset` | string | `onset` on the row of the `Start` marker, `offset` on the row that is `duration_seconds` later; null elsewhere. |
+| `subject_id` | string | Dyad member identifier, `{subject}_{role}` (e.g. `T001_child`). |
+| `role` | string | `child` or `parent`. |
 
-The CSV retains the row order of the original file. Downstream segmentation utilities expect all columns to be present even if some rows contain nulls for the event metadata.
+Notes:
+
+- The file is written with `index=False`, so segmentation relies on row position: `segment_df` looks up the `onset`/`offset` rows via the DataFrame's default `RangeIndex` after the CSV is read back.
+- The offset marker is derived from the fixed per-event window in `src/ecg_utils/parameters.py`, not from the `End` marker in the raw event file. Where a recording was too short to cover the requested window, the offset falls on the last available sample and `reports/data_preparation_report.md` flags the segment as truncated.
+- Because a 500 Hz recording of five events runs to well over a million rows, these files are large (tens of MB per subject) and are excluded from version control.

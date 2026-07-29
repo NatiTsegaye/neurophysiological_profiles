@@ -1,30 +1,10 @@
 # Behavioral Data
 
-Behavioral assessments or questionnaire outputs synced with physiological segments. Use this space for files that augment ECG/EDA metrics with behavioral context.
+Reserved for behavioral assessments or questionnaire outputs to be joined with the physiological segments. **Currently empty for the TECH project** — no behavioral dataset has been added yet, and no notebook in the pipeline reads from here successfully.
 
-## File Schema
+The original project stored a participant-level workbook here (`filtered_data_v3 (with ASAs).xlsx`, containing demographics, ECR attachment scales, early-life unpredictability scores, and story metadata) and merged it with the physiological metrics in `004_reformat_final_datasets.ipynb`. That notebook still expects that file and fails without it; see `Analysis notebooks/README.md`.
 
-The workbook `filtered_data_v3 (with ASAs).xlsx` contains participant-level questionnaire and demographic information. Column definitions:
+When a TECH behavioral dataset is added:
 
-| Column | Type |
-| --- | --- |
-| `ParticipantID` | string |
-| `Gender` | string |
-| `DOB` | date |
-| `Ethnicity`, `Ethnicity_Other` | string |
-| `EduLvl`, `EduLvl_Other` | string |
-| `LTDatingPrtn`, `LTDatingPrtn_Other` | string |
-| `MothEduLvl`, `FatherEduLvl` | string |
-| `MedicCond`, `MedicCond_Other` | string |
-| `HeartCond`, `HeartCond_Other` | string |
-| `Smoking`, `Smoking_Freq`, `Alcohol`, `Alcohol_Freq`, `Caffeine`, `Exercise` | string |
-| `Height`, `Weight`, `BMI` | float |
-| `ECR_*` columns | float |
-| `ECR*RS` columns | float |
-| `ECRAvoidanceScore_*`, `ECRAnxietyScore_*` | float |
-| `EUQ_*` columns | float |
-| `EarlyLifeUnpredictability` | float |
-| `ASAOrder`, `ASA_tot` | float |
-| `STORY{1-5}NAME`, `Story{2-5}_Score` | string/float |
-
-Any downstream merges that combine behavioral metrics with physiology should retain these column names to preserve reproducibility.
+- Document its columns in this README before wiring it into the pipeline.
+- Note that the join key needs to account for the dyad split: physiological `subject_id` values are `{subject}_{role}` (e.g. `T001_child`), whereas a behavioral file will most likely be keyed on the dyad id (`T001`), possibly with separate child and parent measures per row.
