@@ -19,9 +19,9 @@ import ecg_utils.common as common
 #### DATA VALIATION FUNCTIONS ####
 ##################################
 
-def check_segment_list(segments: List[pd.DataFrame]) -> None:
-    if len(segments) != 6:
-        warnings.warn(f"The number of segments is {len(segments)} and not equal to 6.")
+def check_segment_list(segments: List[pd.DataFrame], expected_n_segments: int = 5) -> None:
+    if len(segments) != expected_n_segments:
+        warnings.warn(f"The number of segments is {len(segments)} and not equal to {expected_n_segments}.")
     if not all([isinstance(segment, pd.DataFrame) for segment in segments]):
         raise ValueError("All elements in the list must be pandas DataFrames.")
     # check that none of the dfs in the list is empty

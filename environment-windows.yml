@@ -1,0 +1,18 @@
+name: neuroprofile
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy=1.26.*
+  - pandas=2.2.*
+  - scipy=1.13.*
+  - scikit-learn=1.4.*
+  - matplotlib=3.8.*
+  - openpyxl=3.1.*
+  - pyyaml=6.0.*
+  - jupyterlab=4.0.*
+  - ipykernel
+  - ipywidgets
+  - pip
+  - pip:
+      - neurokit2==0.2.10

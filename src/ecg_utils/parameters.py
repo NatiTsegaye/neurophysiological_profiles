@@ -34,24 +34,28 @@ base_params = {
         'normalize': True
     },
     'segmentation': {
-        'Baseline': { # name of the segment (does not have to correspond to the name in the event.txt)
-            'event_name':'Baseline', # put here the event name from the *event.txt file (e.g., baseline resting start)
-            'default_duration_seconds': 300, # put here the duration (in seconds)
+        # 'duration_seconds' defines the fixed analysis window: each segment starts at its 'Start'
+        # marker and ends 'duration_seconds' later. The 'End' marker in the event files is ignored.
+        'Baseline': { # name of the segment (corresponds to the event token in the filename, e.g. T001_Baseline_raw.txt)
+            'event_name':'Baseline', # put here the event name as it appears in the filename
+            'duration_seconds': 300, # fixed window length (in seconds) measured from the Start marker
+            'default_duration_seconds': 300, # fallback duration used by segment_df if no offset marker is found
             },
-        'Story 1': {
-            'event_name':'Story 1',
+        'DCP': {
+            'event_name':'DCP',
+            'duration_seconds': 600,
             },
-        'Story 2': {
-            'event_name':'Story 2',
+        'IDP': {
+            'event_name':'IDP',
+            'duration_seconds': 600,
             },
-        'Story 3': {
-            'event_name':'Story 3',
+        'NDCP': {
+            'event_name':'NDCP',
+            'duration_seconds': 600,
             },
-        'Story 4': {
-            'event_name':'Story 4',
-            },
-        'Story 5': {
-            'event_name':'Story 5',
+        'Recovery': {
+            'event_name':'Recovery',
+            'duration_seconds': 300,
             },
     }
 }

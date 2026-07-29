@@ -9,19 +9,30 @@ This repository hosts the neurophysiological processing pipeline used to clean, 
 - `data/` – Project datasets organized into `raw/`, `interim/`, `processed/`, `final/`, and `behavioral/` subfolders to track data lineage.
 - `reports/` – Generated figures and QA artefacts (e.g., `reports/QA/ecg/`, `reports/QA/eda/`, `2073_eda_segments.png`).
 - `docs/` – Reference materials and decision logs (e.g., `Mindware Missing Data Report.docx`, `ECG Preprocess Data Quality Log.docx`).
-- `environment.yml` – Conda environment specification for reproducible execution.
+- `environment.yml` – Conda environment specification for macOS (a full `conda env export`, so it will not solve on Windows or Linux).
+- `environment-windows.yml` – Minimal cross-platform specification listing only the packages the pipeline actually imports. Use this on Windows.
 
 ## Getting Started
-1. Create and activate the dedicated environment:
+1. Create and activate the dedicated environment. On macOS:
    ```bash
    conda env create -f environment.yml
    conda activate neuroprofile
    ```
-2. Launch JupyterLab or the IDE of your choice once the environment is active:
+   On Windows (install [Miniforge](https://github.com/conda-forge/miniforge) first, e.g. `winget install --id=CondaForge.Miniforge3 -e`, then run from the Miniforge Prompt):
+   ```bash
+   conda env create -f environment-windows.yml
+   conda activate neuroprofile
+   ```
+2. Register the environment as a Jupyter kernel so the notebooks can select it:
+   ```bash
+   python -m ipykernel install --user --name neuroprofile --display-name "Python (neuroprofile)"
+   ```
+3. Launch JupyterLab or the IDE of your choice once the environment is active:
    ```bash
    jupyter lab
    ```
-3. Update the repository-specific configuration files (e.g., subject-specific overrides inside `src/ecg_utils/parameters.py`) before running analyses.
+   The notebooks resolve the library via `sys.path.append(Path().cwd().parent / "src")`, so the kernel's working directory must be `Analysis notebooks/`. Open them in place rather than copying them elsewhere.
+4. Update the repository-specific configuration files (e.g., subject-specific overrides inside `src/ecg_utils/parameters.py`) before running analyses.
 
 ## Data Organization
 - `data/raw/` – Direct exports from Mindware (ECG, event logs, EDA, etc.). Keep files read-only for provenance.
